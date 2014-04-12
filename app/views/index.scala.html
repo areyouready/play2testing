@@ -1,7 +1,29 @@
-@(message: String)
+@(discs: List[Disc], discForm: Form[String]) 
 
-@main("Welcome to Play") {
+@import helper._
 
-    @play20.welcome(message)
+@main("Laser DB") {
 
+	<h1>@discs.size disc(s)</h1>
+
+	<ul>
+		@discs.map { disc => 
+			<li>
+				@disc.label
+
+				@form(routes.Application.deleteDisc(disc.id)) {
+					<input type="submit" value="Delete">
+				}
+			</li>
+		}
+	</ul>
+
+	<h2>Add new disc</h2>
+
+	@form(routes.Application.newDisc) {
+
+		@inputText(discForm("label"))
+
+		<input type="submit" value="Create">
+	}
 }
