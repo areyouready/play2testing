@@ -5,5 +5,10 @@
 # Home page
 GET     /                           controllers.Application.index
 
+# discs
+GET     /discs                      controllers.Application.discs
+POST    /discs                      controllers.Application.newDisc
+POST    /discs/:id/delete           controllers.Application.deleteDisc(id: Long)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
