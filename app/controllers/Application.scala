@@ -29,7 +29,10 @@ object Application extends Controller {
   		)
   	}
 
-  def deleteDisc(id: Long) = TODO
+  def deleteDisc(id: Long) = Action { implicit request =>
+  	Disc.delete(id)
+  	Redirect(routes.Application.discs)
+  }
 
   val discForm = Form(
   		"label" -> nonEmptyText
