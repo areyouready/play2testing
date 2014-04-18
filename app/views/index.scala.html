@@ -1,8 +1,13 @@
 @(discs: List[Disc], discForm: Form[String]) 
 
 @import helper._
+@import helper.twitterBootstrap._
 
-@main("Laser DB") {
+@title = {
+    Laser DB
+}
+
+@main(title, nav = "index") {
 
 	<h1>@discs.size disc(s)</h1>
 
