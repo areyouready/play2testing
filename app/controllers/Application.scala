@@ -12,26 +12,27 @@ object Application extends Controller {
     //Ok(views.html.index("Your new application is ready."))
     //Ok("Hello World")
     //Ok("Hello World)
-    Redirect(routes.Application.discs)
+    Redirect(routes.Application.discs(""))
   }
 
-  def discs = Action {
-  	 Ok(views.html.index(Disc.all(), discForm))
+  def discs(filter: String) = Action { implicit request =>
+  	 // Ok(views.html.index(Disc.all(), discForm, ""))
+  	 Ok(views.html.index(Disc.list(filter = ("%"+filter+"%")), discForm, filter))
   }
 
   def newDisc = Action { implicit request =>
   		discForm.bindFromRequest.fold(
-  			errors => BadRequest(views.html.index(Disc.all(), errors)),
+  			errors => BadRequest(views.html.index(Disc.all(), errors, "")),
   			label => {
   				Disc.create(label)
-  				Redirect(routes.Application.discs)
+  				Redirect(routes.Application.discs(""))
   			}
   		)
   	}
 
   def deleteDisc(id: Long) = Action { implicit request =>
   	Disc.delete(id)
-  	Redirect(routes.Application.discs)
+  	Redirect(routes.Application.discs(""))
   }
 
   val discForm = Form(

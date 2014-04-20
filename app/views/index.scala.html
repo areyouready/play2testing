@@ -1,4 +1,4 @@
-@(discs: List[Disc], discForm: Form[String]) 
+@(discs: List[Disc], discForm: Form[String], filterValue: String) 
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -10,6 +10,13 @@
 @main(title, nav = "index") {
 
 	<h1>@discs.size disc(s)</h1>
+
+	<div id="tableActions">
+		@helper.form(action=routes.Application.discs()) {
+			<input type="search" id="searchbox" name="filterBox" value="@filterValue" placeholder="Searchtext...">
+			<input type="submit" id="searchsubmit" value="Filter by name" class="btn primary">
+		}
+	</div>
 
 	<table class="table table-striped table-bordered">
 		<thead>

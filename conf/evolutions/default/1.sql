@@ -1,6 +1,7 @@
 # Discs schema
  
 # --- !Ups
+set ignorecase true;
 
 CREATE SEQUENCE disc_id_seq;
 CREATE TABLE disc (
