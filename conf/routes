@@ -7,6 +7,7 @@ GET     /                           controllers.Application.index
 
 # discs
 GET     /discs                      controllers.Application.discs(filterBox ?= "")
+GET     /jsonDiscs                  controllers.Application.jsonDiscs(filterBox ?= "")
 POST    /discs                      controllers.Application.newDisc
 POST    /discs/:id/delete           controllers.Application.deleteDisc(id: Long)
 
