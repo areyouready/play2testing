@@ -18,7 +18,8 @@ object Disc {
 		SQL("select * from disc").as(disc *)
 	}
 	def list(filter: String = "%"): List[Disc] = DB.withConnection { implicit c =>
-		SQL("""select * from disc where disc.label like {filter}""").on(
+		SQL("""select * from disc 
+			where disc.label like {filter}""").on(
 			'filter -> filter).as(disc *)
 	}
 	def create(label: String) {

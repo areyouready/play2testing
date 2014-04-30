@@ -16,10 +16,11 @@ object Application extends Controller {
     (JsPath \ "label").write[String]
   )(unlift(Disc.unapply))
 
+  def compDiscIgCase(e1: Disc, e2: Disc) = (e1.label compareToIgnoreCase e2.label) < 0
+
   def index = Action {
     //Ok(views.html.index("Your new application is ready."))
     //Ok("Hello World")
-    //Ok("Hello World)
     Redirect(routes.Application.discs(""))
   }
 
@@ -27,15 +28,16 @@ object Application extends Controller {
   	 // Ok(views.html.index(Disc.all(), discForm, ""))
   	 println("angekommen " + filter)
      val discList = Disc.list(filter = ("%"+filter+"%"))
-     println("gefiltert " + discList)
-  	 Ok(views.html.index(Disc.list(filter = ("%"+filter+"%")), discForm, filter))
+  	 // Ok(views.html.index(Disc.list(filter = ("%"+filter+"%")), discForm, filter))
+     // Ok(views.html.index(discList.sortBy(_.label), discForm, filter))
+     // Ok(views.html.index(discList, discForm, filter))
+     Ok(views.html.index(discList.sortWith(compDiscIgCase), discForm, filter))
   }
 
   def jsonDiscs(filter: String) = Action { implicit request =>
   	val filteredDiscs = Disc.list(filter = ("%"+filter+"%"))
   	val json = Json.toJson(filteredDiscs)
   	println(json)
-  	// Redirect(routes.Application.discs(filter))
   	Ok(json)
   }
 
