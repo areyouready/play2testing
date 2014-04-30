@@ -6,3 +6,4 @@ Just for my interest some playing around with this web framework and scala
 Simple form for adding Strings to a h2 db.
 Table that shows the sorted values from the db with a delete button in the last cell of every row and a search field.
 Some simple JQuery code that uses the search field for live filtering.
+Integrated Bootstrap3 less files.
