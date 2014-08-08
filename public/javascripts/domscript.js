@@ -9,7 +9,7 @@ $(document).ready(function() {
           for (var i in response) {
           $('#discTable > tbody:first')
             .append($('<tr>')
-              .append($('<td>').text(response[i].label))
+              .append($('<td>').text(response[i].title))
               .append($('<td>', {class: 'col-sm-2'})
                 .append($('<input class="deleteButton" type="submit" value="Delete" id='+response[i].id+' >')
               )
@@ -27,4 +27,10 @@ $(document).ready(function() {
           })
         }
       );
+
+    setTimeout(function(){
+        if ($('.alert').length > 0) {
+            $('.alert').fadeOut(function() { $(this).remove(); });
+        }
+    }, 5000)
   });

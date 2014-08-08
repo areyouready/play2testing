@@ -1,15 +1,15 @@
-# Discs schema
- 
-# --- !Ups
-set ignorecase true;
-
-CREATE SEQUENCE disc_id_seq;
-CREATE TABLE disc (
-    id integer NOT NULL DEFAULT nextval('disc_id_seq'),
-    label varchar(255)
-);
- 
-# --- !Downs
- 
-DROP TABLE disc;
-DROP SEQUENCE disc_id_seq;
+-- # Discs schema
+--
+-- # --- !Ups
+-- set ignorecase true;
+--
+-- CREATE SEQUENCE disc_id_seq;
+-- CREATE TABLE disc (
+--     id integer NOT NULL DEFAULT nextval('disc_id_seq'),
+--     title varchar(255)
+-- );
+--
+-- # --- !Downs
+--
+-- DROP TABLE disc;
+-- DROP SEQUENCE disc_id_seq;

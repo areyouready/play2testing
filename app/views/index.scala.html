@@ -1,4 +1,4 @@
-@(discs: List[Disc], discForm: Form[String], filterValue: String) 
+@(discs: List[Disc], discForm: Form[String], filterValue: String)(implicit flash: play.api.mvc.Flash)
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -8,8 +8,19 @@
 }
 
 @main(title, nav = "index") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success" role="alert">
+            <strong>Done!</strong> @message
+        </div>
+    }
+    @flash.get("error").map { message =>
+        <div class="alert alert-danger" role="alert">
+            <strong>Done!</strong> @message
+        </div>
+    }
 
-	<h1>@discs.size disc(s)</h1>
+
+    <h1>@discs.size disc(s)</h1>
 
 	<div id="tableActions">
 		@helper.form(action=routes.Application.discs()) {
@@ -28,9 +39,9 @@
 		<tbody id="discTableBody">
 		@discs.map { disc => 
 			<tr>
-				<td>@disc.label</td>
+				<td>@disc.title</td>
 
-				<td class="col-sm-2">@form(routes.Application.deleteDisc(disc.id)) {
+				<td class="col-sm-2">@form(routes.Application.couchDeleteDisc(disc.id, disc.rev)) {
 					<input type="submit" value="Delete">
 				}</td>
 			</tr>
@@ -42,7 +53,7 @@
 
 	@form(routes.Application.newDisc) {
 
-		@inputText(discForm("label"))
+		@inputText(discForm("title"))
 
 		<input type="submit" value="Create">
 	}
