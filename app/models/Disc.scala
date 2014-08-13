@@ -36,30 +36,41 @@ object Disc {
 		SQL("select * from disc").as(disc *)
 	}
 
-	def list(filter: String = "%"): List[Disc] = DB.withConnection { implicit c =>
-		SQL("""select * from disc
-			where disc.title like {filter}""").on(
-			'filter -> filter).as(disc *)
-	}
+//	def list(filter: String = "%"): List[Disc] = DB.withConnection { implicit c =>
+//		SQL("""select * from disc
+//			where disc.title like {filter}""").on(
+//			'filter -> filter).as(disc *)
+//	}
 
-  def couchList(filter: String = "%"): Future[Response] = {
-    val startFilter: String = "\"" + filter + "\""
-    val endFilter: String = "\""+ filter + "\\u9999" + "\""
+  //TODO extend with ids to avoid wrong paging through same key name
+  def couchList(filter: String = "%", nxtStartFilter: Option[String], prevFilter: Option[String], desc: Boolean): Future[Response] = {
+    val startFilter: String = nxtStartFilter match {
+      case None => (prevFilter match {
+                      case None => "\"" + filter + "\""
+                      case _    => "\"" + prevFilter.get + "\""})
+      case _    => "\"" + nxtStartFilter.get + "\""
+    }
+
+    val endFilter: String = prevFilter match {
+      case None => "\""+ filter + "\\u9999" + "\""
+      case _    => "\"" + filter + "\""
+    }
+
     val laserRequest = Global.getRequestHolderByHost("/_design/discs/_view/titles").
       withHeaders("Content-Type" -> "application/json").
       withHeaders("Accept" -> "application/json").withQueryString("startkey" -> startFilter).
-      withQueryString("endkey" -> endFilter)
+      withQueryString("endkey" -> endFilter).withQueryString("limit" -> "11").withQueryString("descending" -> desc.toString)
 
     laserRequest.get()
 	}
 
-	def create(title: String) {
-		DB.withConnection { implicit c =>
-			SQL("Insert into disc (title) values ({title})").on(
-				'title -> title
-			).executeUpdate()
-		}
-	}
+//	def create(title: String) {
+//		DB.withConnection { implicit c =>
+//			SQL("Insert into disc (title) values ({title})").on(
+//				'title -> title
+//			).executeUpdate()
+//		}
+//	}
 
   def couchCreate(title: String): Future[Response] = {
     val data = Json.obj(
@@ -68,16 +79,17 @@ object Disc {
     laserClient.post(data)
   }
 
-	def delete(id: Long) {
-		DB.withConnection { implicit c => 
-			SQL("delete from disc where id = {id}").on(
-				'id -> id
-			).executeUpdate()
-		}
-	}
+//	def delete(id: Long) {
+//		DB.withConnection { implicit c =>
+//			SQL("delete from disc where id = {id}").on(
+//				'id -> id
+//			).executeUpdate()
+//		}
+//	}
 
   def couchDelete(id: String, rev: String): Future[Response] = {
     val laserRequest: WSRequestHolder = Global.getRequestHolderByHost("/" + id).withQueryString("rev" -> rev)
     laserRequest.delete()
   }
+
 }

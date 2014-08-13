@@ -1,4 +1,4 @@
-@(discs: List[Disc], discForm: Form[String], filterValue: String)(implicit flash: play.api.mvc.Flash)
+@(discs: List[Disc], discForm: Form[String], filter: String, nxtStart: String, prevStart: String, page: Int)(implicit flash: play.api.mvc.Flash)
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -20,11 +20,11 @@
     }
 
 
-    <h1>@discs.size disc(s)</h1>
+    <h1 id="discCount">@discs.size disc(s)</h1>
 
 	<div id="tableActions">
 		@helper.form(action=routes.Application.discs()) {
-			<input type="search" id="searchbox" class="filter" name="filterBox" value="@filterValue" placeholder="Searchtext...">
+			<input type="search" id="searchbox" class="filter" name="filter" value="@filter" placeholder="Searchtext...">
 			<input type="submit" id="searchsubmit" value="Filter by name" class="btn primary">
 		}
 	</div>
@@ -48,6 +48,18 @@
 		}
 		</tbody>
 	</table>
+    <ul class="pager">
+        @if(page == 0){
+        <li class="previous disabled"><a href="#">&larr; previous</a></li>
+        } else {
+            <li class="previous"><a href="@routes.Application.discs(filter, None, Some(prevStart), Some(page - 1))">&larr; previous</a></li>
+        }
+        @if(nxtStart.isEmpty){
+            <li class="next disabled"><a href="#">next &rarr;</a></li>
+        } else {
+            <li class="next"><a href="@routes.Application.discs(filter, Some(nxtStart), None, Some(page + 1))">next &rarr;</a></li>
+        }
+    </ul>
 
 	<h2>Add new disc</h2>
 

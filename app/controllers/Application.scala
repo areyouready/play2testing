@@ -25,7 +25,7 @@ object Application extends Controller {
   def compDiscIgCase(e1: Disc, e2: Disc) = (e1.title compareToIgnoreCase e2.title) < 0
 
   def index = Action {
-    Redirect(routes.Application.discs(""))
+    Redirect(routes.Application.discs())
   }
 
 //  def discs(filter: String) = Action { implicit request =>
@@ -38,45 +38,76 @@ object Application extends Controller {
 //     Ok(views.html.index(discList.sortWith(compDiscIgCase), discForm, filter))
 //  }
 
-  def discs(filter: String) = Action.async { implicit request =>
-     val discList: Future[Response] = Disc.couchList(filter = (filter))
-    discList.map { resp =>
-      val json = resp.json
-//      val jsonDiscList = scalaConvertedResult.map { m => Map( "id" -> m("id"), "title" -> m("value") )}
-//      val resultList = scalaConvertedResult.map { m => Disc.apply(m("id"), m("value"), m("key"))}
+  //TODO rename to list
+  def discs(filter: String, nxtFilter: Option[String], prevFilter: Option[String], page: Option[Int]) = Action.async {
+    implicit request =>
 
-      val scalaConvertedResult = json.\("rows").\\("value").map(_.as[Map[String, String]])
-      val resultList = scalaConvertedResult.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))}.toList
-     Ok(views.html.index(resultList, discForm, filter))
-    }
+      val desc = prevFilter match {
+        case None => false
+        case _ => true
+      }
+
+      val discList: Future[Response] = Disc.couchList(filter, nxtFilter, prevFilter, desc)
+      discList.map { resp =>
+        val json = resp.json
+        //      val jsonDiscList = scalaConvertedResult.map { m => Map( "id" -> m("id"), "title" -> m("value") )}
+        //      val resultList = scalaConvertedResult.map { m => Disc.apply(m("id"), m("value"), m("key"))}
+
+        val totalRows = (json \ "total_rows").as[Int]
+        val scalaConvertedResult = json.\("rows").\\("value").map(_.as[Map[String, String]])
+        // is needed because at going back in paging the list comes in reversed order
+        val resultList = if (desc == false) scalaConvertedResult.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))}.
+          toList else scalaConvertedResult.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))}.toList.reverse
+        val nxtStart = if (resultList.length > 10) resultList.last.title else ""
+        val lastStart = resultList.head.title
+        val responsePage = page match {
+          case None => 0
+          case _    => page.get
+        }
+
+        Ok(views.html.index(if (resultList.length > 10) resultList.take(resultList.length - 1) else resultList,
+          discForm, filter, nxtStart, lastStart, responsePage))
+//        Ok(views.html.index(resultList, discForm, filter, ""))
+      }
+
   }
 
-  def jsonDiscs(filter: String) = Action { implicit request =>
-  	val filteredDiscs = Disc.list(filter = ("%"+filter+"%"))
-  	val json = Json.toJson(filteredDiscs)
+//  def jsonDiscs(filter: String) = Action { implicit request =>
+//  	val filteredDiscs = Disc.list(filter = ("%"+filter+"%"))
 //    val filteredCouchDiscs = Disc.couchList(filter = (filter))
-  	println(json)
-  	Ok(json)
-  }
+//  	val json = Json.toJson(filteredCouchDiscs)
+//  	println(json)
+//  	Ok(json)
+//  }
 
+  //TODO rename to jsonDiscs/jsonList to avoid confusion with normal discs
   def couchDiscs(filter: String) = Action.async { implicit request =>
-    val filteredCouchDiscs: Future[Response] = Disc.couchList(filter = (filter))
+    val filteredCouchDiscs: Future[Response] = Disc.couchList(filter, None, None, false)
     filteredCouchDiscs.map  { resp =>
-//      val scalaConvertedResult = (json.\("rows")).as[List[Map[String, String]]]
-//      val filteredJson = Json.toJson(scalaConvertedResult.map { m => Map( "id" -> m("id"), "title" -> m("value") )})
+      val json = resp.json
+//      val scalaConvertedResult2 = (json.\("rows")).as[List[Map[String, String]]]
+//      val filteredJson2 = Json.toJson(scalaConvertedResult2.map { m => Map( "id" -> m("id"), "title" -> m("value") )})
 //      println(json.\("rows").\\("value"))
 //      println("Test" + scalaConvertedResult)
-      val json = resp.json
+      val totalRows = (json \ "total_rows").as[Int]
       val scalaConvertedResult = json.\("rows").\\("value").map(_.as[Map[String, String]])
-      val filteredJson = Json.toJson(scalaConvertedResult.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))})
+//      val reducedResult = scalaConvertedResult.take(scalaConvertedResult.length - 1)
 
-      Ok(filteredJson)
+      val filteredJson = Json.toJson(scalaConvertedResult.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))})
+      val resultJson = Json.obj("totalRows" -> totalRows.toString(), "discs" -> filteredJson)
+
+//      val lastElement = (
+//        if (reducedResult.length > 10) scalaConvertedResult.last
+//        else null
+//      )
+
+      Ok(resultJson)
     }
   }
 
   def newDisc = Action.async { implicit request =>
     discForm.bindFromRequest.fold(
-      errors => Future.successful(BadRequest(views.html.index(Disc.all(), errors, ""))),
+      errors => Future.successful(BadRequest(views.html.index(Disc.all(), errors, "", "", "", 0))),
       title => {
 
         val futureResponse: Future[Response] = Disc.couchCreate(title)
@@ -113,7 +144,6 @@ object Application extends Controller {
 //  	Disc.couchDelete(id)
 //  	Redirect(routes.Application.discs(""))
 //  }
-
 
   val discForm = Form(
   		"title" -> nonEmptyText)
