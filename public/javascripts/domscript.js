@@ -15,6 +15,7 @@ $(document).ready(function() {
 
             } else {
                 $('.next, .previous').addClass('disabled')
+                $('.next, a').attr("href", "#")
             }
           $('#discTableBody').empty();
           for (var i in response.discs) {
