@@ -11,7 +11,7 @@ $(document).ready(function() {
                 //TODO if lastEl != null activate paging
                 lastEl = response.discs.pop();
                 $('.next.disabled').removeClass('disabled')
-                $('.next, a').attr("href", "/discs?filter=" + rex2.filter + "&nxtFilter=" + lastEl.title)
+                $('.next, a').attr("href", "/discs?filter=" + rex2.filter + "&nxtFilter=" + lastEl.title + "&page=1")
 
             } else {
                 $('.next, .previous').addClass('disabled')
