@@ -1,4 +1,4 @@
-@(id: String, rev: String, discTitle: String, discForm: Form[String])(implicit flash: play.api.mvc.Flash)
+@(editableDisc: Disc, discForm: Form[String])(implicit flash: play.api.mvc.Flash)
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -9,11 +9,11 @@
     <h2>Edit disc</h2>
 
     <!-- //TODO editAction needs to be created (here only fill of editform is called again) -->
-    @form(routes.Application.editDisc(id, rev, discTitle)) {
+    @form(routes.Application.editDisc(editableDisc.id, editableDisc.rev, editableDisc.title)) {
 
         <fieldset>
 
-            @inputText(discForm("title").copy(value=Some(discTitle)), '_label -> "Disc title")
+            @inputText(discForm("title").copy(value=Some(editableDisc.title)), 'id -> "editTitle", '_label -> "Disc title")
 
         </fieldset>
 
@@ -26,7 +26,8 @@
 
     }
 
-    @form(routes.Application.couchDeleteDisc(id, rev), 'class -> "topRight") {
+    <!-- //TODO needs to be removed and only added on tab via jquery -->
+    @form(routes.Application.couchDeleteDisc(editableDisc.id, editableDisc.rev), 'class -> "topRight") {
         <input type="submit" value="Delete" class="btn danger">
     }
 

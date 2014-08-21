@@ -23,15 +23,33 @@ $(document).ready(function() {
             .append($('<tr>')
               .append($('<td>').text(response.discs[i].title))
               .append($('<td>', {class: 'col-sm-2'})
-                .append($('<input class="deleteButton" type="submit" value="Delete" id='+response.discs[i].id+' >')
+                .append($('<span style="float:left">')
+                  .append($('<input class="btn-table deleteButton" type="submit" value="Delete" id='+i+' >'))
+                )
+                .append($('<span>')
+                  .append($('<input class="btn-table editButton" type="submit" value="Edit" id='+i+' >'))
+                )
               )
-            )
-          );
+            );
 
           $('.deleteButton').click(function() {
-            var id = $(this).attr('id');
+            var id = response.discs[$(this).attr('id')].id
+            var rev = response.discs[$(this).attr('id')].rev
             $(this).parents('tr').hide();
-            $.post('/discs/'+id+'/delete')
+            $('#discCount').text((response.totalRows-1) + " disc(s)")
+            $.post('/discs/'+id+'/'+rev+'/delete')
+
+            });
+
+
+          $('.editButton').click(function() {
+            var id = response.discs[$(this).attr('id')].id
+            var rev = response.discs[$(this).attr('id')].rev
+            var title = response.discs[$(this).attr('id')].title
+            console.log(rev)
+            $('#editTitle').val(title)
+
+            $.post('/discs/'+id+'/'+rev+'/'+title+'/edit')
 
             });
 

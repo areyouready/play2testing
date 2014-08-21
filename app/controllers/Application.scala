@@ -53,7 +53,6 @@ object Application extends Controller {
         //      val jsonDiscList = scalaConvertedResult.map { m => Map( "id" -> m("id"), "title" -> m("value") )}
         //      val resultList = scalaConvertedResult.map { m => Disc.apply(m("id"), m("value"), m("key"))}
 
-        val totalRows = (json \ "total_rows").as[Int]
         val scalaConvertedResult = json.\("rows").\\("value").map(_.as[Map[String, String]])
         // is needed because at going back in paging the list comes in reversed order
         val resultList = if (desc == false) scalaConvertedResult.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))}.
@@ -65,9 +64,10 @@ object Application extends Controller {
           case _    => page.get
         }
 
-        Ok(views.html.index(if (resultList.length > 10) resultList.take(resultList.length - 1) else resultList, totalRows,
-          discForm, filter, nxtStart, lastStart, responsePage, "","",""))
-        //        Ok(views.html.index(resultList, discForm, filter, ""))
+        Ok(views.html.index(if (resultList.length > 10) resultList.take(resultList.length - 1) else resultList, totalRowsFromJson(json),
+          discForm, filter, nxtStart, lastStart, responsePage, new Disc("", "", "")))
+//        Ok(views.html.index(if (resultList.length > 10) resultList.take(resultList.length - 1) else resultList, totalRows,
+//          discForm, filter, nxtStart, lastStart, responsePage, new Disc("", "", "")))
       }
 
   }
@@ -88,13 +88,14 @@ object Application extends Controller {
 //      val scalaConvertedResult2 = (json.\("rows")).as[List[Map[String, String]]]
 //      val filteredJson2 = Json.toJson(scalaConvertedResult2.map { m => Map( "id" -> m("id"), "title" -> m("value") )})
 //      println(json.\("rows").\\("value"))
-//      println("Test" + scalaConvertedResult)
-      val totalRows = (json \ "total_rows").as[Int]
-      val scalaConvertedResult = json.\("rows").\\("value").map(_.as[Map[String, String]])
+
+//      val scalaConvertedResult = json.\("rows").\\("value").map(_.as[Map[String, String]])
+
 //      val reducedResult = scalaConvertedResult.take(scalaConvertedResult.length - 1)
 
-      val filteredJson = Json.toJson(scalaConvertedResult.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))})
-      val resultJson = Json.obj("totalRows" -> totalRows.toString(), "discs" -> filteredJson)
+      val filteredJson = Json.toJson(discsFromJson(json))
+//      val filteredJson = Json.toJson(scalaConvertedResult.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))})
+      val resultJson = Json.obj("totalRows" -> totalRowsFromJson(json).toString(), "discs" -> filteredJson)
 
 //      val lastElement = (
 //        if (reducedResult.length > 10) scalaConvertedResult.last
@@ -107,7 +108,7 @@ object Application extends Controller {
 
   def newDisc = Action.async { implicit request =>
     discForm.bindFromRequest.fold(
-      errors => Future.successful(BadRequest(views.html.index(Disc.all(), 0, errors, "", "", "", 0, "", "", ""))),
+      errors => Future.successful(BadRequest(views.html.index(Disc.all(), 0, errors, "", "", "", 0, new Disc("", "", "")))),
       title => {
 
         val futureResponse: Future[Response] = Disc.couchCreate(title)
@@ -142,17 +143,29 @@ object Application extends Controller {
   }
 
   def editDisc(id: String, rev: String, title: String) = Action { implicit request =>
-    val editDisc: Disc = Disc.apply(id, rev, title)
+//    val editDisc: Disc = Disc.apply(id, rev, title)
+    val editDisc: Disc = edithelp(id,rev,title)
 //    Ok(views.html.editDisc(id, rev, title, discForm.fill(title)))
-    Ok(views.html.index(List[Disc](), 0, discForm, "", "", "", 0, id, rev, title))
+    Ok(views.html.index(List[Disc](), 0, discForm, "", "", "", 0, editDisc))
   }
 
 
+  def edithelp(id: String, rev: String, title: String): Disc = {
+    new Disc(id, rev, title)
+  }
 
 //  def deleteDisc(id: String) = Action { implicit request =>
 //  	Disc.couchDelete(id)
 //  	Redirect(routes.Application.discs(""))
 //  }
+
+//  def getTotalRowsFromJson(json: JsValue): Int = (json \ "total_rows").as[Int]
+  val totalRowsFromJson = (json: JsValue) => (json \ "total_rows").as[Int]
+
+  val discsFromJson = (json: JsValue) => {
+    val scalaMap = (json.\("rows").\\("value").map(_.as[Map[String, String]]))//.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))}
+    scalaMap.map { m => Disc.apply(m("_id"), m("_rev"), m("title"))}
+  }
 
   val discForm = Form(
   		"title" -> nonEmptyText)

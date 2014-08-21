@@ -1,5 +1,5 @@
 @(discs: List[Disc], totalRows: Int, discForm: Form[String], filter: String, nxtStart: String, prevStart: String,
-        page: Int, editableID: String, editableRev: String, editableTitle: String)(implicit flash: play.api.mvc.Flash)
+        page: Int, editableDisc: Disc)(implicit flash: play.api.mvc.Flash)
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -86,7 +86,7 @@
     </div>
 
     <div id="editDisc">
-            @editDisc(editableID, editableRev, editableTitle, discForm)
+            @editDisc(editableDisc, discForm)
     </div>
 
 }
