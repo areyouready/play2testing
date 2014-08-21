@@ -11,6 +11,7 @@ GET         /discs                        controllers.Application.discs(filter ?
 GET         /couchDiscs                   controllers.Application.couchDiscs(filter ?= "")
 POST        /discs                        controllers.Application.newDisc
 POST        /discs/:id/delete             controllers.Application.couchDeleteDisc(id: String, rev: String)
+POST        /discs/:id/edit               controllers.Application.editDisc(id: String, rev: String, title: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                 controllers.Assets.at(path="/public", file)

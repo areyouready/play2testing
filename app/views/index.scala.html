@@ -1,4 +1,5 @@
-@(discs: List[Disc], discForm: Form[String], filter: String, nxtStart: String, prevStart: String, page: Int)(implicit flash: play.api.mvc.Flash)
+@(discs: List[Disc], totalRows: Int, discForm: Form[String], filter: String, nxtStart: String, prevStart: String,
+        page: Int, editableID: String, editableRev: String, editableTitle: String)(implicit flash: play.api.mvc.Flash)
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -20,7 +21,8 @@
     }
 
 
-    <h1 id="discCount">@discs.size disc(s)</h1>
+    @*<h1 id="discCount">@discs.size disc(s)</h1>*@
+    <h1 id="discCount">@totalRows disc(s)</h1>
 
 	<div id="tableActions">
 		@helper.form(action=routes.Application.discs()) {
@@ -37,13 +39,23 @@
 			</tr>
 		</thead>
 		<tbody id="discTableBody">
-		@discs.map { disc => 
+		@discs.map { disc =>
 			<tr>
 				<td>@disc.title</td>
 
-				<td class="col-sm-2">@form(routes.Application.couchDeleteDisc(disc.id, disc.rev)) {
-					<input type="submit" value="Delete">
-				}</td>
+                <td class="col-sm-2">
+                    <span style="float:left">
+                    @form(routes.Application.couchDeleteDisc(disc.id, disc.rev)) {
+                        <input class="btn-table" type="submit" value="Delete">
+                    }
+                    </span>
+                    <span>
+
+                    @form(routes.Application.editDisc(disc.id, disc.rev, disc.title)) {
+                        <input class="btn-table" type="submit" value="Edit">
+                    }
+                    </span>
+                </td>
 			</tr>
 		}
 		</tbody>
@@ -61,6 +73,8 @@
         }
     </ul>
 
+    <div id="newDisc">
+
 	<h2>Add new disc</h2>
 
 	@form(routes.Application.newDisc) {
@@ -69,6 +83,12 @@
 
 		<input type="submit" value="Create">
 	}
+    </div>
+
+    <div id="editDisc">
+            @editDisc(editableID, editableRev, editableTitle, discForm)
+    </div>
+
 }
 
 

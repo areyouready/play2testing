@@ -1,0 +1,34 @@
+@(id: String, rev: String, discTitle: String, discForm: Form[String])(implicit flash: play.api.mvc.Flash)
+
+@import helper._
+@import helper.twitterBootstrap._
+
+
+
+
+    <h2>Edit disc</h2>
+
+    <!-- //TODO editAction needs to be created (here only fill of editform is called again) -->
+    @form(routes.Application.editDisc(id, rev, discTitle)) {
+
+        <fieldset>
+
+            @inputText(discForm("title").copy(value=Some(discTitle)), '_label -> "Disc title")
+
+        </fieldset>
+
+        <div class="actions">
+            <input type="submit" value="Save" class="btn primary"> or
+            <button type="button" class="btn btn-default">
+            <a href="@routes.Application.discs()">Cancel</a>
+            </button>
+        </div>
+
+    }
+
+    @form(routes.Application.couchDeleteDisc(id, rev), 'class -> "topRight") {
+        <input type="submit" value="Delete" class="btn danger">
+    }
+
+
+

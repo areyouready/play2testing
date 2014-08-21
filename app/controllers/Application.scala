@@ -65,9 +65,9 @@ object Application extends Controller {
           case _    => page.get
         }
 
-        Ok(views.html.index(if (resultList.length > 10) resultList.take(resultList.length - 1) else resultList,
-          discForm, filter, nxtStart, lastStart, responsePage))
-//        Ok(views.html.index(resultList, discForm, filter, ""))
+        Ok(views.html.index(if (resultList.length > 10) resultList.take(resultList.length - 1) else resultList, totalRows,
+          discForm, filter, nxtStart, lastStart, responsePage, "","",""))
+        //        Ok(views.html.index(resultList, discForm, filter, ""))
       }
 
   }
@@ -107,7 +107,7 @@ object Application extends Controller {
 
   def newDisc = Action.async { implicit request =>
     discForm.bindFromRequest.fold(
-      errors => Future.successful(BadRequest(views.html.index(Disc.all(), errors, "", "", "", 0))),
+      errors => Future.successful(BadRequest(views.html.index(Disc.all(), 0, errors, "", "", "", 0, "", "", ""))),
       title => {
 
         val futureResponse: Future[Response] = Disc.couchCreate(title)
@@ -140,6 +140,15 @@ object Application extends Controller {
       }
     }
   }
+
+  def editDisc(id: String, rev: String, title: String) = Action { implicit request =>
+    val editDisc: Disc = Disc.apply(id, rev, title)
+//    Ok(views.html.editDisc(id, rev, title, discForm.fill(title)))
+    Ok(views.html.index(List[Disc](), 0, discForm, "", "", "", 0, id, rev, title))
+  }
+
+
+
 //  def deleteDisc(id: String) = Action { implicit request =>
 //  	Disc.couchDelete(id)
 //  	Redirect(routes.Application.discs(""))
