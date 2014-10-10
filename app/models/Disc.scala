@@ -36,11 +36,6 @@ object Disc {
 		SQL("select * from disc").as(disc *)
 	}
 
-//	def list(filter: String = "%"): List[Disc] = DB.withConnection { implicit c =>
-//		SQL("""select * from disc
-//			where disc.title like {filter}""").on(
-//			'filter -> filter).as(disc *)
-//	}
 
   //TODO extend with ids to avoid wrong paging through same key name
   def couchList(filter: String = "%", nxtStartFilter: Option[String], prevFilter: Option[String], desc: Boolean): Future[Response] = {
@@ -64,6 +59,33 @@ object Disc {
     laserRequest.get()
 	}
 
+  def couchCreate(title: String): Future[Response] = {
+    val data = Json.obj(
+      "title" -> title
+    )
+    laserClient.post(data)
+  }
+
+  def couchDelete(id: String, rev: String): Future[Response] = {
+    val laserRequest: WSRequestHolder = Global.getRequestHolderByHost("/" + id).withQueryString("rev" -> rev)
+    laserRequest.delete()
+  }
+
+  def update(id: String, rev: String, title: String): Future[Response] = {
+    val data = Json.obj(
+      "_rev" -> rev,
+      "title" -> title
+    )
+    val laserRequest: WSRequestHolder = Global.getRequestHolderByHost("/" + id)
+    laserRequest.post(data)
+  }
+
+//	def list(filter: String = "%"): List[Disc] = DB.withConnection { implicit c =>
+//		SQL("""select * from disc
+//			where disc.title like {filter}""").on(
+//			'filter -> filter).as(disc *)
+//	}
+
 //	def create(title: String) {
 //		DB.withConnection { implicit c =>
 //			SQL("Insert into disc (title) values ({title})").on(
@@ -72,13 +94,6 @@ object Disc {
 //		}
 //	}
 
-  def couchCreate(title: String): Future[Response] = {
-    val data = Json.obj(
-      "title" -> title
-    )
-    laserClient.post(data)
-  }
-
 //	def delete(id: Long) {
 //		DB.withConnection { implicit c =>
 //			SQL("delete from disc where id = {id}").on(
@@ -86,10 +101,4 @@ object Disc {
 //			).executeUpdate()
 //		}
 //	}
-
-  def couchDelete(id: String, rev: String): Future[Response] = {
-    val laserRequest: WSRequestHolder = Global.getRequestHolderByHost("/" + id).withQueryString("rev" -> rev)
-    laserRequest.delete()
-  }
-
 }

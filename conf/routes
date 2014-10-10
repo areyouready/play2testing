@@ -7,11 +7,9 @@ GET         /                             controllers.Application.index
 
 # discs
 GET         /discs                        controllers.Application.discs(filter ?= "", nxtFilter: Option[String] ?= None, prevFilter: Option[String] ?= None, page: Option[Int] ?= None)
-#GET     /jsonDiscs                  controllers.Application.jsonDiscs(filterBox ?= "")
-GET         /couchDiscs                   controllers.Application.couchDiscs(filter ?= "")
 POST        /discs                        controllers.Application.newDisc
 POST        /discs/:id/:rev/delete        controllers.Application.couchDeleteDisc(id: String, rev: String)
-POST        /discs/:id/:rev/:title/edit   controllers.Application.editDisc(id: String, rev: String, title: String)
+GET         /discs/:id/:rev/:title/edit   controllers.Application.editDisc(id: String, rev: String, title: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                 controllers.Assets.at(path="/public", file)
