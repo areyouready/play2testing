@@ -87,7 +87,7 @@ object Application extends Controller {
       errors => Future.successful(BadRequest(views.html.index(Disc.all(), 0, errors, "", "", "", 0, new Disc("", "", "")))),
       title => {
 
-        val futureResponse: Future[Response] = Disc.couchCreate(title)
+        val futureResponse: Future[Response] = Disc.couchCreate(title.title)
         futureResponse.map ( resp =>
           resp.getAHCResponse.getStatusCode match {
             case 201 => {
@@ -119,11 +119,35 @@ object Application extends Controller {
 
   def editDisc(id: String, rev: String, title: String) = Action { implicit request =>
     val editDisc: Disc = Disc.apply(id, rev, title)
+
 //    val editDisc: Disc = edithelp(id,rev,title)
 //    Ok(views.html.editDisc(id, rev, title, discForm.fill(title)))
-    Ok(views.html.index(List[Disc](), 0, discForm, "", "", "", 0, editDisc))
+    Ok(views.html.index(List[Disc](), 0, discForm.fill(editDisc), "", "", "", 0, editDisc))
   }
 
+  def updateDisc() = Action.async { implicit request =>
+//    val id = request.getQueryString("id").get
+//    val title = request.getQueryString("title").get
+//    val rev = request.getQueryString("rev").get
+    discForm.bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(views.html.index(Disc.all(), 0, formWithErrors, "", "", "", 0, new Disc
+      ("", "",
+        "")
+      ))),
+      values => {
+        val futureResponse: Future[Response] = Disc.update(values.id, values.rev, values.title)
+        futureResponse.map(resp =>
+          resp.getAHCResponse.getStatusCode match {
+            case 201 =>
+              Redirect(routes.Application.discs("")).flashing(
+                "success" -> "The item has been updated")
+            case _ =>
+              Redirect(routes.Application.discs("")).flashing(
+                "error" -> "The item could not be updated")
+          })
+      }
+    )
+  }
 
   val totalRowsFromJson = (json: JsValue) => (json \ "total_rows").as[Int]
 
@@ -133,7 +157,20 @@ object Application extends Controller {
   }
 
   val discForm = Form(
-  		"title" -> nonEmptyText)
+//  		"title" -> nonEmptyText)
+    mapping(
+      "id" -> text,
+      "rev" -> text,
+      "title" -> nonEmptyText)
+      (Disc.apply)(Disc.unapply))
+
+  val updateDiscForm = Form(
+    mapping(
+    "title" -> nonEmptyText,
+    "id" -> nonEmptyText,
+    "rev" -> nonEmptyText)
+      (Disc.apply)(Disc.unapply))
+
 //TODO add mapping (validation) when automatic fetching of id for new disc is implemented or use "id" -> ignored(0L)
 //  mapping(
 //    (Disc.apply)(Disc.unapply))

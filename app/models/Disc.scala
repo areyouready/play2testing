@@ -77,7 +77,7 @@ object Disc {
       "title" -> title
     )
     val laserRequest: WSRequestHolder = Global.getRequestHolderByHost("/" + id)
-    laserRequest.post(data)
+    laserRequest.put(data)
   }
 
 //	def list(filter: String = "%"): List[Disc] = DB.withConnection { implicit c =>

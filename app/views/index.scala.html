@@ -1,4 +1,4 @@
-@(discs: List[Disc], totalRows: Int, discForm: Form[String], filter: String, nxtStart: String, prevStart: String,
+@(discs: List[Disc], totalRows: Int, discForm: Form[Disc], filter: String, nxtStart: String, prevStart: String,
         page: Int, editableDisc: Disc)(implicit flash: play.api.mvc.Flash)
 
 @import helper._
@@ -79,14 +79,14 @@
 
 	@form(routes.Application.newDisc) {
 
-		@inputText(discForm("title"))
+		@inputText(discForm("title"), '_label -> "Disc Title")
 
 		<input type="submit" value="Create">
 	}
     </div>
 
     <div id="editDisc">
-            @editDisc(editableDisc, discForm)
+        @editDisc(editableDisc, discForm)
     </div>
 
 }

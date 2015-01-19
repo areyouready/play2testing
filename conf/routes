@@ -3,13 +3,15 @@
 # ~~~~
 
 # Home page
-GET         /                             controllers.Application.index
+GET         /                                  controllers.Application.index
 
 # discs
-GET         /discs                        controllers.Application.discs(filter ?= "", nxtFilter: Option[String] ?= None, prevFilter: Option[String] ?= None, page: Option[Int] ?= None)
-POST        /discs                        controllers.Application.newDisc
-POST        /discs/:id/:rev/delete        controllers.Application.couchDeleteDisc(id: String, rev: String)
-GET         /discs/:id/:rev/:title/edit   controllers.Application.editDisc(id: String, rev: String, title: String)
+GET         /discs                             controllers.Application.discs(filter ?= "", nxtFilter: Option[String] ?= None, prevFilter: Option[String] ?= None, page: Option[Int] ?= None)
+POST        /discs                             controllers.Application.newDisc
+POST        /discs/:id/:rev/delete             controllers.Application.couchDeleteDisc(id: String, rev: String)
+GET         /discs/:id/:rev/:title/edit        controllers.Application.editDisc(id: String, rev: String, title: String)
+#POST        /discs/:id/:rev/:title/edit        controllers.Application.updateDisc(id: String, rev: String, title: String)
+POST        /discs/update                      controllers.Application.updateDisc()
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                 controllers.Assets.at(path="/public", file)
+GET         /assets/*file                      controllers.Assets.at(path="/public", file)

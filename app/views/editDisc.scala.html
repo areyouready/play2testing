@@ -1,4 +1,4 @@
-@(editableDisc: Disc, discForm: Form[String])(implicit flash: play.api.mvc.Flash)
+@(editableDisc: Disc, discForm: Form[Disc])(implicit flash: play.api.mvc.Flash)
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -9,11 +9,15 @@
     <h2>Edit disc</h2>
 
     <!-- //TODO editAction needs to be created (here only fill of editform is called again) -->
-    @form(routes.Application.editDisc(editableDisc.id, editableDisc.rev, editableDisc.title)) {
+    <!-- //TODO needs to be POST Action (nor URL Parameters) -->
+
+    @form(routes.Application.updateDisc) {
 
         <fieldset>
 
-            @inputText(discForm("title").copy(value=Some(editableDisc.title)), 'id -> "editTitle", '_label -> "Disc title")
+            <input type="hidden" name="id" value='@editableDisc.id' >
+            <input type="hidden" name="rev" value='@editableDisc.rev' >
+            @inputText(discForm("title"), '_label -> "Disc title")
 
         </fieldset>
 
@@ -30,6 +34,5 @@
     @form(routes.Application.couchDeleteDisc(editableDisc.id, editableDisc.rev), 'class -> "topRight") {
         <input type="submit" value="Delete" class="btn danger">
     }
-
 
 
