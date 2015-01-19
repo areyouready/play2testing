@@ -157,22 +157,10 @@ object Application extends Controller {
   }
 
   val discForm = Form(
-//  		"title" -> nonEmptyText)
     mapping(
       "id" -> text,
       "rev" -> text,
       "title" -> nonEmptyText)
       (Disc.apply)(Disc.unapply))
-
-  val updateDiscForm = Form(
-    mapping(
-    "title" -> nonEmptyText,
-    "id" -> nonEmptyText,
-    "rev" -> nonEmptyText)
-      (Disc.apply)(Disc.unapply))
-
-//TODO add mapping (validation) when automatic fetching of id for new disc is implemented or use "id" -> ignored(0L)
-//  mapping(
-//    (Disc.apply)(Disc.unapply))
 
 }
