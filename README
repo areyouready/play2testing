@@ -3,10 +3,12 @@ First steps with play2 and scala
 
 Just for my interest some playing around with this web framework and scala
 
-Simple form for CRUD operations with a couchdb.
-Table that shows the sorted values from the db with a delete and a edit button in the last cell 
-of every row and a search field. Clicking edit loads the corresponding value to a minimalistic
-edit form for updating.
+Simple web application for CRUD operations with a couchdb.
+The view contains a table that shows the sorted values from the db with a delete and a edit 
+button in the last cell of every row and a search field. Clicking edit loads the 
+corresponding value to a minimalistic edit form for updating. Another separate form is used
+for adding new values to the DB.
+When too many values are added a self implemented paging splits the table up.
 
-Some simple JQuery code that uses the search field for live filtering via AJAX.
+Some simple JQuery code uses a search field for live filtering via AJAX.
 Integrated Bootstrap3 less files.
